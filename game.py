@@ -27,7 +27,7 @@ def get_states() -> list[State]:
     states: list[State] = []
     file_dict = load_json('states.json')
     for key, value in file_dict.items():
-        states.append(State(key, value, f"imgs/{value}.jpg"))
+        states.append(State(key, value, f"imgs/{key}.jpg"))
     return states
 
 
@@ -111,7 +111,7 @@ class Game:
 
     def choice_screen(self):
         options, answer_index = self.get_correct_answer()
-        value = easygui.ccbox(
+        value = easygui.indexbox(
             msg="Which is the acronym of the red state?",
             choices=list(map(lambda x: x.acronym.upper(), options)),
             image=options[answer_index].image_path
@@ -127,11 +127,12 @@ class Game:
             for _ in range(self.rounds):
                 self.choice_screen()
 
-            if easygui.boolbox(
-                msg="Would you like to play again?",
-                choices=["Yes", "No"]
-            ):
-                break
+            # if easygui.boolbox(
+            #     msg="Would you like to play again?",
+            #     choices=["Yes", "No"]
+            # ):
+            #     break
+            break
 
 
 if __name__ == "__main__":
