@@ -17,8 +17,8 @@ def resize_image(image_path, output_path):
         width, height = image.size
 
         # Calculate new dimensions (half the size)
-        new_width = round(width * 0.5)
-        new_height = round(height * 0.5)
+        new_width = round(width * 0.25)
+        new_height = round(height * 0.25)
 
         # Resize the image
         resized_image = image.resize((new_width, new_height))
