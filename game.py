@@ -120,11 +120,18 @@ class Game:
             self.score += 1
 
     def start(self):
-        self.set_rounds()
-        self.set_options_amount()
+        while True:
+            self.set_rounds()
+            self.set_options_amount()
 
-        for _ in range(self.rounds):
-            self.choice_screen()
+            for _ in range(self.rounds):
+                self.choice_screen()
+
+            if easygui.boolbox(
+                msg="Would you like to play again?",
+                choices=["Yes", "No"]
+            ):
+                break
 
 
 if __name__ == "__main__":
