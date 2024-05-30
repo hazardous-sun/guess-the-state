@@ -12,7 +12,7 @@ Features
 ## Requirements
 
 * Python 3.x
-* EasyGUI library (https://easygui.sourceforge.net/)
+* EasyGUI library (https://pypi.org/project/easygui/)
 
 ## Installation
 
