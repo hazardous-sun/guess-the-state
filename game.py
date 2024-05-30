@@ -34,17 +34,33 @@ def get_states() -> list[State]:
 class Game:
     """
     Contains the game logic of the game.
-
-    :param states: the list of states. If not provided, the game will use the data under "states.json".
     """
 
-    def __init__(self, states=None):
-        if states is None:
-            states = get_states()
-        self.states: list[State] = states
-        self.rounds = 0
+    def __init__(self):
+        self.states: list[State] = []
+        self.valid_states: list[State] = []
         self.options_amount = 0
+        self.rounds = 0
         self.score = 0
+
+    def set_states(self):
+        self.states = get_states()
+        self.valid_states = get_states()
+
+    def set_options_amount(self):
+        match int(easygui.indexbox(
+            title="Options amount per round",
+            msg="How many options do you wish to have at each phase?",
+            choices=["3 option", "9 options", "All 27 options"]
+        )):
+            case 0:
+                self.options_amount = 3
+            case 1:
+                self.options_amount = 9
+            case 2:
+                self.options_amount = 27
+            case _:
+                pass
 
     def set_rounds(self):
         """
@@ -52,24 +68,9 @@ class Game:
         :return:
         """
         match int(easygui.indexbox(
-                    title="Define rounds",
-                    msg="How many round do you wish to play?",
-                    choices=["3 states", "9 states", "All 27 states"]
-                )):
-            case 0:
-                self.rounds = 3
-            case 1:
-                self.rounds = 9
-            case 2:
-                self.rounds = 27
-            case _:
-                pass
-
-    def set_options_amount(self):
-        match int(easygui.indexbox(
-            title="Options amount per round",
-            msg="How many options do you wish to have at each phase?",
-            choices=["3 option", "9 options", "All 27 options"]
+            title="Define rounds",
+            msg="How many round do you wish to play?",
+            choices=["3 states", "9 states", "All 27 states"]
         )):
             case 0:
                 self.rounds = 3
@@ -80,59 +81,77 @@ class Game:
             case _:
                 pass
 
+    def set_score(self):
+        self.score = 0
+
     def randomize_states(self):
         random.shuffle(self.states)
 
-    def get_options(self) -> list[State]:
+    def remove_state(self, removed_state: State):
+        """
+        Removes one valid state from states.
+
+        :param removed_state:
+        :return:
+        """
+        for state in self.states:
+            if state.acronym == removed_state.acronym:
+                self.states.remove(state)
+
+    def get_options(self) -> (list[State], State):
         """
         Returns a list of all possible options that the player can choose from based on self.options_amount value.
 
         :return:
         """
+        # Initializes temporary variables for storing the options that will be returned along
         options: list[State] = []
-        temp_removed_states: list[State] = []
 
-        for _ in range(self.rounds):
+        answer: State = random.choice(self.valid_states)
+        self.valid_states.remove(answer)
+        self.remove_state(answer)
+
+        options.append(answer)
+        for _ in range(self.options_amount - 1):
             new_state = random.choice(self.states)
-            temp_removed_states.append(new_state)
-            self.states.remove(new_state)
             options.append(new_state)
+            self.states.remove(new_state)
 
-        for state in temp_removed_states:
+        # Re-insert the removed values from self.states
+        for state in options:
             self.states.append(state)
 
-        return options
+        random.shuffle(options)
 
-    def get_correct_answer(self) -> (list[State], int):
-        self.randomize_states()
-        options = self.get_options()
-        answer_index = random.randint(0, len(options) - 1)
-        return options, answer_index
+        return options, answer
 
     def choice_screen(self):
-        options, answer_index = self.get_correct_answer()
-        value = easygui.indexbox(
+        options, answer = self.get_options()
+        index = easygui.indexbox(
             msg="Which is the acronym of the red state?",
             choices=list(map(lambda x: x.acronym.upper(), options)),
-            image=options[answer_index].image_path
+            image=answer.image_path
         )
-        if value == self.states[answer_index].acronym.upper():
+        print(index)
+        print(answer.acronym.upper())
+        if options[index].acronym == answer.acronym:
             self.score += 1
 
     def start(self):
+        self.set_states()
         while True:
             self.set_rounds()
             self.set_options_amount()
+            self.set_score()
 
             for _ in range(self.rounds):
                 self.choice_screen()
 
-            # if easygui.boolbox(
-            #     msg="Would you like to play again?",
-            #     choices=["Yes", "No"]
-            # ):
-            #     break
-            break
+            if not easygui.boolbox(
+                    msg=f"Your score was: {self.score}/{self.rounds}\nWould you like to play again?",
+                    choices=["Yes", "No"]
+            ):
+                break
 
 
 if __name__ == "__main__":
