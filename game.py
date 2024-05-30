@@ -132,8 +132,6 @@ class Game:
             choices=list(map(lambda x: x.acronym.upper(), options)),
             image=answer.image_path
         )
-        print(index)
-        print(answer.acronym.upper())
         if options[index].acronym == answer.acronym:
             self.score += 1
 
