@@ -128,7 +128,7 @@ class Game:
     def choice_screen(self):
         options, answer = self.get_options()
         index = easygui.indexbox(
-            msg="Which is the acronym of the red state?",
+            msg=f"Which is the acronym of the red state?\tYour current score is {self.score}/{self.rounds}",
             choices=list(map(lambda x: x.acronym.upper(), options)),
             image=answer.image_path
         )
